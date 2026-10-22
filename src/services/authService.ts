@@ -32,11 +32,13 @@ export const loginWithGoogle = async () => {
 
 export const logout = () => signOut(auth);
 
-// подписка на состояние сессии (срабатывает при старте, входе и выходе)
 export const subscribeToAuth = (callback: (user: AppUser | null) => void) =>
-  onAuthStateChanged(auth, (user) => callback(user ? mapUser(user) : null));
+  onAuthStateChanged(
+    auth,
+    (user) => callback(user ? mapUser(user) : null),
+    () => callback(null)
+  );
 
-// человекочитаемые ошибки
 export const getAuthErrorMessage = (error: unknown): string => {
   const code = (error as { code?: string })?.code;
 
@@ -55,7 +57,7 @@ export const getAuthErrorMessage = (error: unknown): string => {
       return 'Забагато спроб. Спробуйте пізніше';
     case 'auth/popup-closed-by-user':
     case 'auth/cancelled-popup-request':
-      return ''; // пользователь сам закрыл окно, ошибку не показываем
+      return '';
     case 'auth/network-request-failed':
       return 'Проблеми з мережею';
     default:
