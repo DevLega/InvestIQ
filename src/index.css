@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+:root {
+  font-style: "Roboto";
+}
+
+body {
+  background-color: white;
+}
+
+.scroll-orange {
+  scrollbar-width: thin;
+  scrollbar-color: #ff7a1a #f4f6fb;
+}
+
+.scroll-orange::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scroll-orange::-webkit-scrollbar-track {
+  background: #f4f6fb;
+}
+
+.scroll-orange::-webkit-scrollbar-thumb {
+  background: #ff7a1a;
+  border-radius: 9999px;
+}
