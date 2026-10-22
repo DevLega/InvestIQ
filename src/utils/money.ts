@@ -11,3 +11,6 @@ export const parseAmount = (value: string) => {
 };
 
 export const isAmountInput = (value: string) => /^\d*([.,]\d{0,2})?$/.test(value);
+
+export const formatMoneyShort = (value: number) =>
+  Number.isInteger(value) ? formatMoney(value).slice(0, -3) : formatMoney(value);

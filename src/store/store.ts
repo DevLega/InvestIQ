@@ -3,6 +3,7 @@ import authReducer from './authSlice';
 import notificationReducer from './notificationSlice';
 import transactionsReducer from './transactionsSlice';
 import balanceReducer from './balanceSlice';
+import reportsReducer from './reportsSlice';
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,8 @@ export const store = configureStore({
     notification: notificationReducer,
     transactions: transactionsReducer,
     balance: balanceReducer,
+    reports: reportsReducer,
+
   },
 });
 

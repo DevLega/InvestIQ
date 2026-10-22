@@ -13,6 +13,12 @@ export const selectActiveTab = (state: RootState) => state.transactions.activeTa
 export const selectInitialBalance = (state: RootState) => state.balance.initialBalance;
 export const selectIsBalanceConfirmed = (state: RootState) => state.balance.isConfirmed;
 
+export const selectReportMonth = (state: RootState) => state.reports.month;
+export const selectReportYear = (state: RootState) => state.reports.year;
+export const selectReportType = (state: RootState) => state.reports.type;
+export const selectReportCategory = (state: RootState) => state.reports.category;
+
+
 export const selectActiveTransactions = createSelector(
     [selectTransactions, selectActiveTab],
     (items, tab) => items.filter((t) => t.type === tab)
@@ -39,5 +45,58 @@ export const selectMonthlySummary = createSelector(
             .map((total, month) => ({ month, total: round2(total) }))
             .slice(0, now.getMonth() + 1)
             .reverse();
+    }
+);
+
+const selectMonthTransactions = createSelector(
+    [selectTransactions, selectReportMonth, selectReportYear],
+    (items, month, year) =>
+        items.filter((t) => getYear(t.date) === year && getMonth(t.date) === month)
+);
+
+export const selectMonthTotals = createSelector([selectMonthTransactions], (items) => {
+    let expense = 0;
+    let income = 0;
+
+    items.forEach((t) => {
+        if (t.type === 'expense') expense += t.amount;
+        else income += t.amount;
+    });
+
+    return { expense: round2(expense), income: round2(income) };
+});
+
+export const selectCategoryTotals = createSelector(
+    [selectMonthTransactions, selectReportType],
+    (items, type) => {
+        const totals: Record<string, number> = {};
+
+        items.forEach((t) => {
+            if (t.type === type) totals[t.category] = round2((totals[t.category] ?? 0) + t.amount);
+        });
+
+        return totals;
+    }
+);
+
+export const selectChartData = createSelector(
+    [selectMonthTransactions, selectReportType, selectReportCategory],
+    (items, type, category) => {
+        const groups = new Map<string, { label: string; total: number }>();
+
+        items
+            .filter((t) => t.type === type && (!category || t.category === category))
+            .forEach((t) => {
+                const label = t.description.trim();
+                const key = label.toLowerCase(); // "Банани" и "банани" считаем одним товаром
+                const prev = groups.get(key);
+
+                groups.set(key, { label: prev?.label ?? label, total: (prev?.total ?? 0) + t.amount });
+            });
+
+        return [...groups.values()]
+            .map((g) => ({ ...g, total: round2(g.total) }))
+            .sort((a, b) => b.total - a.total)
+            .slice(0, 10);
     }
 );
